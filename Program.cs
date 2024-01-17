@@ -1,45 +1,46 @@
 ﻿using System;
 using System.Data.SQLite;
 
-class Program {
+class Program
+{
     static void Main()
     {
-       string databasePath = "habit_log.db";
-       string? userInput;
+        string databasePath = "habit_log.db";
+        string? userInput;
 
-       if (!File.Exists(databasePath))
-       {
-        CreateDatabase(databasePath);
-       }
+        if (!File.Exists(databasePath))
+        {
+            CreateDatabase(databasePath);
+        }
 
-       MainMenu();
-       userInput = Console.ReadLine();
+        MainMenu();
+        userInput = Console.ReadLine();
 
-       switch (userInput)
-       {
-        case "0":
-            break;
-        case "1":
-            // view records
-            Console.Clear();
-            Console.WriteLine("Viewing records...");
-            ViewRecords(databasePath);
-            break;
-        case "2":
-            // insert records
-            Console.WriteLine("Inserting records...");
-            break;
-        case "3":
-            // delete records
-            Console.WriteLine("Deleting records...");
-            break;
-        case "4":
-            // update records
-            Console.WriteLine("Updating records...");
-            break;
-        default:
-            break;
-       }
+        switch (userInput)
+        {
+            case "0":
+                break;
+            case "1":
+                // view records
+                Console.Clear();
+                Console.WriteLine("Viewing records...");
+                ViewRecords(databasePath);
+                break;
+            case "2":
+                // insert records
+                Console.WriteLine("Inserting records...");
+                break;
+            case "3":
+                // delete records
+                Console.WriteLine("Deleting records...");
+                break;
+            case "4":
+                // update records
+                Console.WriteLine("Updating records...");
+                break;
+            default:
+                break;
+        }
     }
 
     static void CreateDatabase(string databasePath)
