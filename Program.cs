@@ -5,12 +5,13 @@ class Program
 {
     static void Main()
     {
-        string databasePath = "habit_log.db";
+        string DatabasePath = "habit_log.db";
         string? userInput;
 
-        if (!File.Exists(databasePath))
+        if (!File.Exists(DatabasePath))
         {
-            CreateDatabase(databasePath);
+            Console.WriteLine("Database not found. Creating...");
+            CreateDatabase(DatabasePath);
         }
 
         MainMenu();
@@ -24,11 +25,12 @@ class Program
                 // view records
                 Console.Clear();
                 Console.WriteLine("Viewing records...");
-                ViewRecords(databasePath);
+                ViewRecords(DatabasePath);
                 break;
             case "2":
                 // insert records
                 Console.WriteLine("Inserting records...");
+                InsertRecords(DatabasePath);
                 break;
             case "3":
                 // delete records
@@ -43,11 +45,11 @@ class Program
         }
     }
 
-    static void CreateDatabase(string databasePath)
+    static void CreateDatabase(string DatabasePath)
     {
-        SQLiteConnection.CreateFile(databasePath);
+        SQLiteConnection.CreateFile(DatabasePath);
 
-        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={databasePath};Version=3"))
+        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
         {
             connection.Open();
 
@@ -66,7 +68,54 @@ class Program
             connection.Close();
         }
 
-        Console.WriteLine($"Database created at: {Path.GetFullPath(databasePath)}");
+        Console.WriteLine($"Database created at: {Path.GetFullPath(DatabasePath)}");
+    }
+
+
+    static void ViewRecords(string DatabasePath)
+    {
+        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3;"))
+        {
+            connection.Open();
+
+            // select all records from habits table
+            string SelectQuery = "SELECT * FROM Habit";
+
+            using (SQLiteCommand command = new SQLiteCommand(SelectQuery, connection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                Console.WriteLine("Habit Table:");
+                Console.WriteLine("ID\tHabitName\tQuantity");
+
+                while (reader.Read())
+                {
+                    Console.WriteLine($"{reader["Id"]}\t{reader["HabitName"]}\t\t{reader["Quantity"]}");
+                }
+                Console.WriteLine("---------------------------------");
+            }
+
+            connection.Close();
+        }
+
+    }
+
+    static void InsertRecords(string DatabasePath)
+    {
+        string? NewHabit;
+        int HabitQuantity;
+        int HabitID = 0;
+
+        Console.Write("Add habit: ");
+        NewHabit = Console.ReadLine();
+        Console.Write("Quantity: ");
+        HabitQuantity = Convert.ToInt32(Console.ReadLine());
+
+        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
+        {
+            connection.Open();
+            // insert habit into table 
+            string InsertQuery = "";
+        }
     }
 
     static void MainMenu()
@@ -79,31 +128,5 @@ class Program
         Console.WriteLine("Type 2 to Insert Record.");
         Console.WriteLine("Type 3 to Delete Record.");
         Console.WriteLine("Type 4 to Update Record.");
-    }
-
-    static void ViewRecords(string databasePath)
-    {
-        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={databasePath};Version=3;"))
-        {
-            connection.Open();
-
-            // select all records from habits table
-            string selectQuery = "SELECT * FROM Habit";
-
-            using (SQLiteCommand command = new SQLiteCommand(selectQuery, connection))
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                Console.WriteLine("Habit Table:");
-                Console.WriteLine("ID\tHabitName\tQuantity");
-
-                while (reader.Read())
-                {
-                    Console.WriteLine($"{reader["Id"]}\t{reader["HabitName"]}\t\t{reader["Quantity"]}");
-                }
-            }
-
-            connection.Close();
-        }
-
     }
 }
