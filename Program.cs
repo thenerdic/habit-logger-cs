@@ -103,7 +103,6 @@ class Program
     {
         string? NewHabit;
         int HabitQuantity;
-        int HabitID = 0;
 
         Console.Write("Add habit: ");
         NewHabit = Console.ReadLine();
@@ -114,7 +113,17 @@ class Program
         {
             connection.Open();
             // insert habit into table 
-            string InsertQuery = "";
+            string InsertQuery = "INSERT INTO Habit (HabitName, Quantity) VALUES (@habitname, @quantity)";
+
+            using (SQLiteCommand command = new SQLiteCommand(InsertQuery, connection))
+            {
+                command.Parameters.AddWithValue("@habitname", NewHabit);
+                command.Parameters.AddWithValue("@quantity", HabitQuantity);
+
+                command.ExecuteNonQuery();
+            }
+
+            connection.Close();
         }
     }
 
