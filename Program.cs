@@ -35,6 +35,7 @@ class Program
             case "3":
                 // delete records
                 Console.WriteLine("Deleting records...");
+                DeleteRecords(DatabasePath);
                 break;
             case "4":
                 // update records
@@ -64,7 +65,6 @@ class Program
             {
                 command.ExecuteNonQuery();
             }
-
             connection.Close();
         }
 
@@ -74,13 +74,12 @@ class Program
 
     static void ViewRecords(string DatabasePath)
     {
-        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3;"))
+        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
         {
             connection.Open();
 
             // select all records from habits table
             string SelectQuery = "SELECT * FROM Habit";
-
             using (SQLiteCommand command = new SQLiteCommand(SelectQuery, connection))
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
@@ -93,7 +92,6 @@ class Program
                 }
                 Console.WriteLine("---------------------------------");
             }
-
             connection.Close();
         }
 
@@ -112,17 +110,34 @@ class Program
         using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
         {
             connection.Open();
-            // insert habit into table 
-            string InsertQuery = "INSERT INTO Habit (HabitName, Quantity) VALUES (@habitname, @quantity)";
-
+            string InsertQuery = "INSERT INTO Habit (HabitName, Quantity) VALUES (@habitname, @quantity)"; // query to insert into table
             using (SQLiteCommand command = new SQLiteCommand(InsertQuery, connection))
             {
+                // insert record into table 
                 command.Parameters.AddWithValue("@habitname", NewHabit);
                 command.Parameters.AddWithValue("@quantity", HabitQuantity);
 
                 command.ExecuteNonQuery();
             }
+            connection.Close();
+        }
+    }
 
+    static void DeleteRecords(string DatabasePath)
+    {
+        int HabitID;
+        Console.Write("Enter ID of table you wish to delete: ");
+        HabitID = Convert.ToInt32(Console.ReadLine());
+
+        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
+        {
+            connection.Open();
+            string DeleteQuery = "DELETE FROM Habit WHERE Id  = @id";
+            using (SQLiteCommand command = new SQLiteCommand(DeleteQuery, connection))
+            {
+                command.Parameters.AddWithValue("@id", HabitID);
+                command.ExecuteNonQuery();
+            }
             connection.Close();
         }
     }
