@@ -40,6 +40,7 @@ class Program
             case "4":
                 // update records
                 Console.WriteLine("Updating records...");
+                UpdateRecords(DatabasePath);
                 break;
             default:
                 break;
@@ -126,15 +127,39 @@ class Program
     static void DeleteRecords(string DatabasePath)
     {
         int HabitID;
-        Console.Write("Enter ID of table you wish to delete: ");
+        Console.Write("Enter ID of row you wish to delete: ");
         HabitID = Convert.ToInt32(Console.ReadLine());
 
         using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
         {
             connection.Open();
-            string DeleteQuery = "DELETE FROM Habit WHERE Id  = @id";
+            string DeleteQuery = "DELETE FROM Habit WHERE Id = @id";
             using (SQLiteCommand command = new SQLiteCommand(DeleteQuery, connection))
             {
+                command.Parameters.AddWithValue("@id", HabitID);
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+    }
+
+    static void UpdateRecords(string DatabasePath)
+    {
+        int NewQuantity;
+        int HabitID;
+
+        Console.Write("Enter ID of row you wish to update: ");
+        HabitID = Convert.ToInt32(Console.ReadLine());
+        Console.Write("New quantity:  ");
+        NewQuantity = Convert.ToInt32(Console.ReadLine());
+
+        using (SQLiteConnection connection = new SQLiteConnection($"Data Source={DatabasePath};Version=3"))
+        {
+            connection.Open();
+            string UpdateQuery = "UPDATE Habit SET Quantity = @quantity WHERE Id = @id";
+            using (SQLiteCommand command = new SQLiteCommand(UpdateQuery, connection))
+            {
+                command.Parameters.AddWithValue("@quantity", NewQuantity);
                 command.Parameters.AddWithValue("@id", HabitID);
                 command.ExecuteNonQuery();
             }
@@ -145,7 +170,7 @@ class Program
     static void MainMenu()
     {
         Console.Clear();
-        Console.WriteLine("MAIN MENU\n");
+        Console.WriteLine("Habit-Logger - MAIN MENU\n");
         Console.WriteLine("What would you like to do?\n");
         Console.WriteLine("Type 0 to Close Application.");
         Console.WriteLine("Type 1 to View All Records.");
